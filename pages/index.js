@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import { Line, Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -175,7 +175,6 @@ export default function Home() {
     <>
       <Head>
         <title>Web Monitoring</title>
-        <link rel="stylesheet" href="/style.css" />
       </Head>
       <div className="container">
         <h1>Smart Home Monitoring</h1>
