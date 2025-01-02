@@ -1,6 +1,19 @@
 import { useEffect, useState } from "react";
 import Head from "next/head";
-import { Line, Bar } from 'react-chartjs-2';
+import dynamic from 'next/dynamic';
+
+// Dynamic import untuk Chart components
+const Line = dynamic(
+  () => import('react-chartjs-2').then(mod => mod.Line),
+  { ssr: false } // Disable server-side rendering
+);
+
+const Bar = dynamic(
+  () => import('react-chartjs-2').then(mod => mod.Bar),
+  { ssr: false }
+);
+
+// Dynamic import untuk Chart.js
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -15,25 +28,29 @@ import {
   Filler
 } from 'chart.js';
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
-
 export default function Home() {
   const [data, setData] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
   const [maxValues, setMaxValues] = useState({});
   const [minValues, setMinValues] = useState({});
   const [avgValues, setAvgValues] = useState({});
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    ChartJS.register(
+      CategoryScale,
+      LinearScale,
+      PointElement,
+      LineElement,
+      BarElement,
+      ArcElement,
+      Title,
+      Tooltip,
+      Legend,
+      Filler
+    );
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -206,14 +223,16 @@ export default function Home() {
                 </span>
               </div>
             </div>
-            <div className="charts-grid">
-              <div className="chart-container">
-                <Line options={areaChartOptions} data={areaChartData} />
+            {isClient && (
+              <div className="charts-grid">
+                <div className="chart-container">
+                  <Line options={areaChartOptions} data={areaChartData} />
+                </div>
+                <div className="chart-container">
+                  {barChartData && <Bar options={barChartOptions} data={barChartData} />}
+                </div>
               </div>
-              <div className="chart-container">
-                {barChartData && <Bar options={barChartOptions} data={barChartData} />}
-              </div>
-            </div>
+            )}
           </>
         ) : (
           <p>Loading...</p>
