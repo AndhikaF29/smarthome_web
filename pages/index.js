@@ -41,18 +41,13 @@ export default function Home() {
         const response = await fetch("https://api-smarthome.vercel.app/sensor/get");
         const result = await response.json();
         
-        // Urutkan data berdasarkan timestamp terbaru
         const sortedData = result.data.sort((a, b) => 
           new Date(b.timestamp) - new Date(a.timestamp)
         );
         
-        // Ambil data terbaru
         setData(sortedData[0]);
-        
-        // Ambil 10 data terbaru untuk grafik
         setHistoricalData(sortedData.slice(0, 10).reverse());
 
-        // Hitung nilai maksimum, minimum, dan rata-rata
         const temperatures = result.data.map(item => item.temperature);
         const humidities = result.data.map(item => item.humidity);
         const waterLevels = result.data.map(item => item.water_level);
@@ -80,10 +75,8 @@ export default function Home() {
       }
     };
 
-    // Panggil fetchData setiap 1 detik
     fetchData();
     const interval = setInterval(fetchData, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -132,12 +125,12 @@ export default function Home() {
     ]
   };
 
-  const barChartData = {
+  const barChartData = data ? {
     labels: ['Temperature', 'Humidity', 'Water Level'],
     datasets: [
       {
         label: 'Current Values',
-        data: data ? [data.temperature, data.humidity, data.water_level] : [],
+        data: [data.temperature, data.humidity, data.water_level],
         backgroundColor: [
           'rgba(255, 99, 132, 0.8)',
           'rgba(53, 162, 235, 0.8)',
@@ -151,7 +144,7 @@ export default function Home() {
         borderWidth: 1
       }
     ]
-  };
+  } : null;
 
   const barChartOptions = {
     responsive: true,
@@ -218,7 +211,7 @@ export default function Home() {
                 <Line options={areaChartOptions} data={areaChartData} />
               </div>
               <div className="chart-container">
-                <Bar options={barChartOptions} data={barChartData} />
+                {barChartData && <Bar options={barChartOptions} data={barChartData} />}
               </div>
             </div>
           </>
